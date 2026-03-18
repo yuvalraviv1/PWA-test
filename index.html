@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Onepager">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Onepager</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; }
+
+    #setup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100dvh;
+      gap: 16px;
+      padding: 32px;
+    }
+    #setup h1 { font-size: 1.4rem; color: #1a1a1a; }
+    #setup input {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 1.5px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+    }
+    #setup input:focus { border-color: #1a1a1a; }
+    #setup button {
+      padding: 12px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    iframe {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+    }
+
+    #reset-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      display: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="setup">
+    <h1>Onepager Setup</h1>
+    <input id="url-input" type="url" placeholder="https://example.com" autocapitalize="none">
+    <button onclick="save()">Save &amp; Open</button>
+  </div>
+  <iframe id="frame" allowfullscreen></iframe>
+  <button id="reset-btn" onclick="reset()">Change URL</button>
+
+  <script>
+    const STORAGE_KEY = 'onepager_url';
+
+    function launch(url) {
+      document.getElementById('setup').style.display = 'none';
+      const frame = document.getElementById('frame');
+      frame.src = url;
+      frame.style.display = 'block';
+      document.getElementById('reset-btn').style.display = 'block';
+    }
+
+    function reset() {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    function save() {
+      const url = document.getElementById('url-input').value.trim();
+      if (!url) return;
+      localStorage.setItem(STORAGE_KEY, url);
+      launch(url);
+    }
+
+    // On load: check if URL already stored
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      launch(stored);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+
+</html>
